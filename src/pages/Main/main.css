@@ -1,0 +1,29 @@
+.main-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  height: 100vh;
+}
+
+.main-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.main-right {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.main-left-up {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.main-left-down {
+  display: flex;
+  flex: 1;
+}

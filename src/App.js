@@ -1,6 +1,10 @@
+import Main from './pages/Main';
+
 function App() {
   return (
-    <div> Best Character Sheet </div>
+    <div>
+      <Main />
+    </div>
   );
 }
 
