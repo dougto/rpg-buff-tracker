@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { StatBlock } from '../components/StatBlock';
 import { BuffBlock } from '../components/BuffBlock';
@@ -20,7 +20,7 @@ const startingCharacterState: CharacterData = {
 		{ name: 'div_favor', enabled: false, stats: { ar_luck: 3, ad_luck: 3 } },
 	],
 	formulas: [
-		{ name: 'axe', formula: 'bba+(str/2)+ar_luck' }
+		{ name: 'axe', formula: 'bba+str/2+ar_luck' }
 	],
 };
 
@@ -39,10 +39,39 @@ const BlocksContainer = styled.div`
 
 const Main = () => {
 	const [ characterData, setCharacterData ] = useState<CharacterData>(startingCharacterState);
+	const [ statPool, setStatPool ] = useState<Record<string,number>>({});
+
+	const generateStatPool = () => {
+		const newStatPool: Record<string,number> = {};
+
+		characterData.stats.forEach((stat) => {
+			newStatPool[stat.name] = stat.value;
+		});
+
+		characterData.buffs.forEach((buff) => {
+			Object.keys(buff.stats).forEach((buffStat) => {
+				const previousValue = newStatPool[buffStat] || 0;
+
+				if (buff.enabled){
+					newStatPool[buffStat] = previousValue + buff.stats[buffStat];
+					return;
+				}
+
+				newStatPool[buffStat] = previousValue;
+			});
+		});
+
+		setStatPool(newStatPool);
+	};
 
 	const updateCharacterData = (newValue: CharacterData) => {
 		setCharacterData(structuredClone(newValue));
+		generateStatPool();
 	};
+
+	useEffect(() => {
+		generateStatPool();
+	}, []);
 
 	return (
 		<MainContainer>
@@ -56,6 +85,7 @@ const Main = () => {
 					updateCharacterData={updateCharacterData}
 				/>
 				<FormulaBlock
+					statPool={statPool}
 					characterData={characterData}
 					updateCharacterData={updateCharacterData}
 				/>

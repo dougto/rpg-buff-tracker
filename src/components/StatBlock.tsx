@@ -28,7 +28,15 @@ const StatContainer = styled.div`
 `;
 
 const StatName = styled.p`
-  width: 20%;
+  min-width: 20%;
+  margin: 0 0 10px 0;
+`;
+
+const NewStatInput = styled.input`
+  width: 80px;
+  text-align: center;
+  height: 20px;
+  margin-right: 60px;
 `;
 
 const StatValue = styled.input`
@@ -36,6 +44,7 @@ const StatValue = styled.input`
   text-align: center;
   height: 20px;
   margin-right: 60px;
+  background-color: #afe4ff;
 `;
 
 const RemoveButton = styled.button`
@@ -108,7 +117,7 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 			<StatBlockTitle>Stats</StatBlockTitle>
 			<StatContainer>
 				<StatName>Add new stat: </StatName>
-				<StatValue onChange={(event) => { setNewStatName(event.target.value); }}/>
+				<NewStatInput onChange={(event) => { setNewStatName(event.target.value); }}/>
 				<button onClick={() => {addStat(newStatName);}}>add</button>
 			</StatContainer>
 			<HorizontalLine/>

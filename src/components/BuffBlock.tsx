@@ -40,7 +40,7 @@ const NewBuffContainer = styled.div`
 `;
 
 const NewBuffInput = styled.input`
-  width: 40px;
+  width: 80px;
   text-align: center;
   height: 20px;
   margin: 0 60px 0 20px;
@@ -50,7 +50,7 @@ const NewStatInput = styled.input`
   width: 40px;
   text-align: center;
   height: 20px;
-  margin: 0;
+  margin: 0 10px 0 0;
 `;
 
 const BuffName = styled.p`
@@ -59,6 +59,7 @@ const BuffName = styled.p`
 `;
 
 const BuffStat = styled.p`
+  width: 40%;
   margin: 0 20px 0 0;
 `;
 
@@ -75,13 +76,21 @@ const BuffStatsInput = styled.input`
   width: 20px;
   text-align: center;
   height: 16px;
+  margin-right: 10px;
+  background-color: #afe4ff;
 `;
 
 const BuffRow = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-direction: row;
   width: 65%;
+  margin-bottom: 4px;
+`;
+
+const RemoveStatButton = styled.button`
+  color: red;
+  margin: 0;
 `;
 
 const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterData }) => {
@@ -130,8 +139,6 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 				buff.enabled = checked;
 			}
 		});
-
-		console.log(buffsCopy);
 
 		updateCharacterData({
 			...characterData,
@@ -189,6 +196,21 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 		});
 	};
 
+	const removeBuffStat = (buffName: string, stat: string) => {
+		const buffsCopy = [ ...characterData.buffs ];
+
+		buffsCopy.forEach((buff) => {
+			if (buff.name === buffName) {
+				delete buff.stats[stat];
+			}
+		});
+
+		updateCharacterData({
+			...characterData,
+			buffs: buffsCopy,
+		});
+	};
+
 	return (
 		<BuffBlockContainer>
 			<BuffBlockTitle>Buffs</BuffBlockTitle>
@@ -210,6 +232,7 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 									onChange={(event) => {onBuffStatChange(buff.name, stat, event.target.value);}}
 									defaultValue={buff.stats[stat]}
 								/>
+								<RemoveStatButton onClick={() => {removeBuffStat(buff.name, stat);}}>X</RemoveStatButton>
 							</BuffRow>
 						))}
 						<BuffRow>
