@@ -36,15 +36,52 @@ const NewFormulaInput = styled.input`
   margin: 0 60px 0 20px;
 `;
 
+const FormulaContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  margin-bottom: 8px;
+  background-color: #b2b2f7;
+  padding: 8px 8px 8px 20px;
+`;
+
+const FormulaRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const FormulaName = styled.p`
+  margin: 0;
+`;
+
+const FormulaExpression = styled.input`
+  text-align: center;
+  height: 16px;
+  margin-right: 10px;
+  background-color: #afe4ff;
+`;
+
+const ResultNumber = styled.span`
+  color: #019401;
+  font-weight: bold;
+  font-size: 18px;
+`;
+
 const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, updateCharacterData }) => {
 	const [ newFormulaName, setNewFormulaName ] = useState('');
 
-	// const validateFormula = (formula: string) => {
-	// 	return !formula.match(/\D\D|\D$|^\D|^0/g);
-	// };
-
 	const evalFormula = (formula: string) => {
+		if (!formula) {
+			return 0;
+		}
+
 		const statNames = Object.keys(statPool);
+
+		if (statNames.length === 0) {
+			return 0;
+		}
 
 		let expression = formula;
 
@@ -54,11 +91,43 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 			}
 		});
 
-		return eval(expression);
+		expression = expression.replaceAll(' ', '');
+
+		try {
+			const result = Math.floor(eval(expression));
+
+			return result;
+		} catch (error) {
+			return 0;
+		}
 	};
 
 	const addNewFormula = (name: string) => {
 		const newFormulas = [ ...characterData.formulas, { name, formula: '' } ];
+
+		updateCharacterData({
+			...characterData,
+			formulas: newFormulas,
+		});
+	};
+
+	const editFormula = (formulaName: string, value: string) => {
+		const formulasCopy = [ ...characterData.formulas ];
+
+		formulasCopy.forEach((formula) => {
+			if (formula.name === formulaName) {
+				formula.formula = value;
+			}
+		});
+
+		updateCharacterData({
+			...characterData,
+			formulas: formulasCopy,
+		});
+	};
+
+	const removeFormula = (name: string) => {
+		const newFormulas = [ ...characterData.formulas ].filter((formula) => formula.name !== name);
 
 		updateCharacterData({
 			...characterData,
@@ -76,10 +145,17 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 			</NewFormulaContainer>
 			<HorizontalLine/>
 			{characterData.formulas.map((formula) => (
-				<div key={formula.name}>
-					<p >{formula.name}: {formula.formula}</p>
-					<p >result: {evalFormula(formula.formula)}</p>
-				</div>
+				<FormulaContainer key={formula.name}>
+					<FormulaRow>
+						<FormulaName>{formula.name}</FormulaName>
+						<FormulaExpression
+							onChange={(event) => {editFormula(formula.name, event.target.value);}}
+							defaultValue={formula.formula}
+						/>
+						<button onClick={() => {removeFormula(formula.name);}}>Remove</button>
+					</FormulaRow>
+					<p>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></p>
+				</FormulaContainer>
 			))}
 		</FormulaBlockContainer>
 	);

@@ -6,22 +6,9 @@ import { FormulaBlock } from '../components/FormulaBlock';
 import { CharacterData } from '../shared/interfaces';
 
 const startingCharacterState: CharacterData = {
-	stats: [
-		{ name: 'str', value: 26 },
-		{ name: 'dex', value: 14 },
-		{ name: 'con', value: 18 },
-		{ name: 'int', value: 5 },
-		{ name: 'cha', value: 12 },
-		{ name: 'wis', value: 13 },
-		{ name: 'bba', value: 14 },
-	],
-	buffs: [
-		{ name: 'rage', enabled: false, stats: { str: 6, con: 4, ac: -2 } },
-		{ name: 'div_favor', enabled: false, stats: { ar_luck: 3, ad_luck: 3 } },
-	],
-	formulas: [
-		{ name: 'axe', formula: 'bba+str/2+ar_luck' }
-	],
+	stats: [],
+	buffs: [],
+	formulas: [],
 };
 
 const MainContainer = styled.div`
@@ -36,6 +23,8 @@ const BlocksContainer = styled.div`
   flex: 1;
   justify-content: space-between;
 `;
+
+const storageKey = 'dt-bt';
 
 const Main = () => {
 	const [ characterData, setCharacterData ] = useState<CharacterData>(startingCharacterState);
@@ -66,12 +55,20 @@ const Main = () => {
 
 	const updateCharacterData = (newValue: CharacterData) => {
 		setCharacterData(structuredClone(newValue));
-		generateStatPool();
+		localStorage.setItem(storageKey, JSON.stringify(newValue));
 	};
 
 	useEffect(() => {
-		generateStatPool();
+		const data = localStorage.getItem(storageKey);
+
+		if (data) {
+			setCharacterData(JSON.parse(data));
+		}
 	}, []);
+
+	useEffect(() => {
+		generateStatPool();
+	}, [ characterData ]);
 
 	return (
 		<MainContainer>
