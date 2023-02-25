@@ -85,7 +85,12 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 
 		let expression = formula;
 
-		statNames.forEach((stat) => {
+		statNames.sort((prev, next) => {
+			if (prev.length > next.length) {
+				return -1;
+			}
+			return 1;
+		}).forEach((stat) => {
 			if (formula.includes(stat)) {
 				expression = expression.replaceAll(stat, String(statPool[stat]));
 			}
@@ -140,7 +145,7 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 			<FormulaBlockTitle>Formulas</FormulaBlockTitle>
 			<NewFormulaContainer>
 				<p>Add new formula: </p>
-				<NewFormulaInput value={newFormulaName} onChange={(event) => { setNewFormulaName(event.target.value); }}/>
+				<NewFormulaInput value={newFormulaName} onChange={(event) => { setNewFormulaName(event.target.value.trim()); }}/>
 				<button onClick={(event) => {
 					event.preventDefault();
 					addNewFormula(newFormulaName);
@@ -153,7 +158,7 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 					<FormulaRow>
 						<FormulaName>{formula.name}</FormulaName>
 						<FormulaExpression
-							onChange={(event) => {editFormula(formula.name, event.target.value);}}
+							onChange={(event) => {editFormula(formula.name, event.target.value.trim());}}
 							defaultValue={formula.formula}
 						/>
 						<button tabIndex={-1} onClick={() => {removeFormula(formula.name);}}>Remove</button>

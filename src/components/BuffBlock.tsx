@@ -181,6 +181,10 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 	};
 
 	const addNewBuffStat = (buffName: string) => {
+		if (!newBuffStat[buffName]) {
+			return;
+		}
+
 		const buffsCopy = [ ...characterData.buffs ];
 
 		buffsCopy.forEach((buff) => {
@@ -216,7 +220,7 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 			<BuffBlockTitle>Buffs</BuffBlockTitle>
 			<NewBuffContainer>
 				<p>Add new buff: </p>
-				<NewBuffInput value={newBuffName} onChange={(event) => { setNewBuffName(event.target.value); }}/>
+				<NewBuffInput value={newBuffName} onChange={(event) => { setNewBuffName(event.target.value.trim()); }}/>
 				<button onClick={(event) => {
 					event.preventDefault();
 					addNewBuff(newBuffName);
@@ -233,7 +237,7 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 							<BuffRow key={stat}>
 								<BuffStat >{stat}: </BuffStat>
 								<BuffStatsInput
-									onChange={(event) => {onBuffStatChange(buff.name, stat, event.target.value);}}
+									onChange={(event) => {onBuffStatChange(buff.name, stat, event.target.value.trim());}}
 									defaultValue={buff.stats[stat]}
 								/>
 								<RemoveStatButton tabIndex={-1} onClick={() => {removeBuffStat(buff.name, stat);}}>X</RemoveStatButton>
@@ -241,7 +245,7 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 						))}
 						<BuffRow>
 							<form>
-								<NewStatInput value={newBuffStat[buff.name]} onChange={(event) => {onNewStatChange(buff.name, event.target.value);}}/>
+								<NewStatInput value={newBuffStat[buff.name]} onChange={(event) => {onNewStatChange(buff.name, event.target.value.trim());}}/>
 								<button onClick={(event) => {
 									event.preventDefault();
 									addNewBuffStat(buff.name);

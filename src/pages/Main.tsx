@@ -9,6 +9,7 @@ import { CharacterData, CharactersStorage } from '../shared/interfaces';
 
 const MainContainer = styled.div`
   width: 100vw;
+	min-height: 100vh;
   background-color: #dadaf8;
 `;
 
@@ -120,13 +121,29 @@ const Main = () => {
 
 	const renderCharacterSelection = () => {
 		return (
-			<SelectionContainer>
-				<CharacterSelectionBlock
-					characterStorage={characterStorageState}
-					updateCharactersStorage={updateCharactersStorage}
-					setSelectedCharacter={setSelectedCharacter}
-				/>
-			</SelectionContainer>
+			<>
+				<SelectionContainer>
+					<CharacterSelectionBlock
+						characterStorage={characterStorageState}
+						updateCharactersStorage={updateCharactersStorage}
+						setSelectedCharacter={setSelectedCharacter}
+					/>
+				</SelectionContainer>
+				<BackupContainer>
+					<p>To load backup, paste the backup code in the field below:</p>
+					<WarningText>WARNING: this will overwrite your current data</WarningText>
+					<form>
+						<input value={backupInput} onChange={(event) => {setBackupInput(event.target.value);}}/>
+						<button style={{ marginLeft: 10 }} onClick={(event) => {
+							event.preventDefault();
+							loadBackupCode(backupInput);
+							setBackupInput('');
+						}}>Load backup</button>
+					</form>
+					<p>To save backup, copy the code below and save it somewhere safe:</p>
+					<CodeParagraph>{backupCode}</CodeParagraph>
+				</BackupContainer>
+			</>
 		);
 	};
 
@@ -175,20 +192,6 @@ const Main = () => {
 	return (
 		<MainContainer>
 			{selectedCharacter ? renderCharacterBlocks() : renderCharacterSelection()}
-			<BackupContainer>
-				<p>To load backup, paste the backup code in the field below:</p>
-				<WarningText>WARNING: this will overwrite your current data</WarningText>
-				<form>
-					<input value={backupInput} onChange={(event) => {setBackupInput(event.target.value);}}/>
-					<button style={{ marginLeft: 10 }} onClick={(event) => {
-						event.preventDefault();
-						loadBackupCode(backupInput);
-						setBackupInput('');
-					}}>Load backup</button>
-				</form>
-				<p>To save backup, copy the code below and save it somewhere safe:</p>
-				<CodeParagraph>{backupCode}</CodeParagraph>
-			</BackupContainer>
 		</MainContainer>
 	);
 };

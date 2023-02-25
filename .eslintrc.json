@@ -20,6 +20,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "no-useless-escape": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "object-curly-spacing": ["error", "always"],
         "array-bracket-spacing": ["error", "always"],

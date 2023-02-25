@@ -111,9 +111,9 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 		const newStat = { name, value: numberValue };
 
 		const newStats = [ ...characterData.stats ];
-		newStats.forEach((stat) => {
+		newStats.forEach((stat, index) => {
 			if (stat.name === name) {
-				stat = newStat;
+				newStats[index] = newStat;
 			}
 		});
 
@@ -130,7 +130,7 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 			<StatBlockTitle>Stats</StatBlockTitle>
 			<NewStatContainer>
 				<StatName>Add new stat: </StatName>
-				<NewStatInput value={newStatName} onChange={(event) => { setNewStatName(event.target.value); }}/>
+				<NewStatInput value={newStatName} onChange={(event) => { setNewStatName(event.target.value.trim()); }}/>
 				<button onClick={(event) => {
 					event.preventDefault();
 					addStat(newStatName);
@@ -141,7 +141,7 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 			{characterData.stats.map((stat) => (
 				<StatContainer key={stat.name}>
 					<StatName >{stat.name}:</StatName>
-					<StatValue onChange={(event) => { editStat(stat.name, event.target.value); }} defaultValue={stat.value}/>
+					<StatValue onChange={(event) => { editStat(stat.name, event.target.value.trim()); }} defaultValue={stat.value}/>
 					<RemoveButton tabIndex={-1} onClick={() => {removeStat(stat.name);}}>X</RemoveButton>
 				</StatContainer>
 			))}
