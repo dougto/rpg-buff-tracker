@@ -1,3 +1,7 @@
+export interface CharactersStorage {
+  [name: string]: CharacterData;
+}
+
 export interface CharacterData {
   stats: Array<{
     name: string;
