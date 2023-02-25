@@ -36,7 +36,7 @@ const CharacterName = styled.p`
   font-weight: bold;
 `;
 
-const NewCharacterContainer = styled.div`
+const NewCharacterContainer = styled.form`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -110,8 +110,12 @@ const CharacterSelectionBlock: React.FC<CharacterSelectionBlockProps> = ({
 		<CharacterSelectionBox>
 			{renderCharacterList()}
 			<NewCharacterContainer>
-				<NewCharacterInput onChange={(event) => {setNewCharacterName(event.target.value);}}/>
-				<button onClick={() => {addCharacter(newCharacterName);}}>Add character</button>
+				<NewCharacterInput value={newCharacterName} onChange={(event) => {setNewCharacterName(event.target.value);}}/>
+				<button onClick={(event) => {
+					event.preventDefault();
+					addCharacter(newCharacterName);
+					setNewCharacterName('');
+				}}>Add character</button>
 			</NewCharacterContainer>
 		</CharacterSelectionBox>
 	);

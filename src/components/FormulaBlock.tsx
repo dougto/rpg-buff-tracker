@@ -20,7 +20,7 @@ const FormulaBlockTitle = styled.h1`
   font-weight: normal;
 `;
 
-const NewFormulaContainer = styled.div`
+const NewFormulaContainer = styled.form`
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -140,8 +140,12 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 			<FormulaBlockTitle>Formulas</FormulaBlockTitle>
 			<NewFormulaContainer>
 				<p>Add new formula: </p>
-				<NewFormulaInput onChange={(event) => { setNewFormulaName(event.target.value); }}/>
-				<button onClick={() => {addNewFormula(newFormulaName);}}>add</button>
+				<NewFormulaInput value={newFormulaName} onChange={(event) => { setNewFormulaName(event.target.value); }}/>
+				<button onClick={(event) => {
+					event.preventDefault();
+					addNewFormula(newFormulaName);
+					setNewFormulaName('');
+				}}>add</button>
 			</NewFormulaContainer>
 			<HorizontalLine/>
 			{characterData.formulas.map((formula) => (
@@ -152,7 +156,7 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 							onChange={(event) => {editFormula(formula.name, event.target.value);}}
 							defaultValue={formula.formula}
 						/>
-						<button onClick={() => {removeFormula(formula.name);}}>Remove</button>
+						<button tabIndex={-1} onClick={() => {removeFormula(formula.name);}}>Remove</button>
 					</FormulaRow>
 					<p>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></p>
 				</FormulaContainer>

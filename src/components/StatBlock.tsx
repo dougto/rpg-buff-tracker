@@ -19,6 +19,14 @@ const StatBlockTitle = styled.h1`
   font-weight: normal;
 `;
 
+const NewStatContainer = styled.form`
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
 const StatContainer = styled.div`
   display: flex;
   width: 100%;
@@ -102,7 +110,12 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 
 		const newStat = { name, value: numberValue };
 
-		const newStats = [ newStat, ...characterData.stats.filter((stat) => stat.name !== name) ];
+		const newStats = [ ...characterData.stats ];
+		newStats.forEach((stat) => {
+			if (stat.name === name) {
+				stat = newStat;
+			}
+		});
 
 		const newCharacterData: CharacterData = {
 			...characterData,
@@ -115,17 +128,21 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 	return (
 		<StatBlockContainer>
 			<StatBlockTitle>Stats</StatBlockTitle>
-			<StatContainer>
+			<NewStatContainer>
 				<StatName>Add new stat: </StatName>
-				<NewStatInput onChange={(event) => { setNewStatName(event.target.value); }}/>
-				<button onClick={() => {addStat(newStatName);}}>add</button>
-			</StatContainer>
+				<NewStatInput value={newStatName} onChange={(event) => { setNewStatName(event.target.value); }}/>
+				<button onClick={(event) => {
+					event.preventDefault();
+					addStat(newStatName);
+					setNewStatName('');
+				}}>add</button>
+			</NewStatContainer>
 			<HorizontalLine/>
 			{characterData.stats.map((stat) => (
 				<StatContainer key={stat.name}>
 					<StatName >{stat.name}:</StatName>
 					<StatValue onChange={(event) => { editStat(stat.name, event.target.value); }} defaultValue={stat.value}/>
-					<RemoveButton onClick={() => {removeStat(stat.name);}}>X</RemoveButton>
+					<RemoveButton tabIndex={-1} onClick={() => {removeStat(stat.name);}}>X</RemoveButton>
 				</StatContainer>
 			))}
 		</StatBlockContainer>

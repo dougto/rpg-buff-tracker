@@ -30,7 +30,7 @@ const BuffContainer = styled.div`
   padding: 8px;
 `;
 
-const NewBuffContainer = styled.div`
+const NewBuffContainer = styled.form`
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -216,8 +216,12 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 			<BuffBlockTitle>Buffs</BuffBlockTitle>
 			<NewBuffContainer>
 				<p>Add new buff: </p>
-				<NewBuffInput onChange={(event) => { setNewBuffName(event.target.value); }}/>
-				<button onClick={() => {addNewBuff(newBuffName);}}>add</button>
+				<NewBuffInput value={newBuffName} onChange={(event) => { setNewBuffName(event.target.value); }}/>
+				<button onClick={(event) => {
+					event.preventDefault();
+					addNewBuff(newBuffName);
+					setNewBuffName('');
+				}}>add</button>
 			</NewBuffContainer>
 			<HorizontalLine />
 			{characterData.buffs.map((buff) => (
@@ -232,12 +236,18 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 									onChange={(event) => {onBuffStatChange(buff.name, stat, event.target.value);}}
 									defaultValue={buff.stats[stat]}
 								/>
-								<RemoveStatButton onClick={() => {removeBuffStat(buff.name, stat);}}>X</RemoveStatButton>
+								<RemoveStatButton tabIndex={-1} onClick={() => {removeBuffStat(buff.name, stat);}}>X</RemoveStatButton>
 							</BuffRow>
 						))}
 						<BuffRow>
-							<NewStatInput onChange={(event) => {onNewStatChange(buff.name, event.target.value);}}/>
-							<button onClick={() => {addNewBuffStat(buff.name);}}>add stat</button>
+							<form>
+								<NewStatInput value={newBuffStat[buff.name]} onChange={(event) => {onNewStatChange(buff.name, event.target.value);}}/>
+								<button onClick={(event) => {
+									event.preventDefault();
+									addNewBuffStat(buff.name);
+									onNewStatChange(buff.name, ' ');
+								}}>add stat</button>
+							</form>
 						</BuffRow>
 					</BuffStatsContainer>
 					<button onClick={() => {removeBuff(buff.name);}}>Remove buff</button>
