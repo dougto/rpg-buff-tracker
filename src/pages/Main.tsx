@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
+import { Buffer } from 'buffer';
 import { CharacterSelectionBlock } from '../components/CharacterSelectionBlock';
 import { StatBlock } from '../components/StatBlock';
 import { BuffBlock } from '../components/BuffBlock';
@@ -8,7 +9,6 @@ import { CharacterData, CharactersStorage } from '../shared/interfaces';
 
 const MainContainer = styled.div`
   width: 100vw;
-  height: 100vh;
   background-color: #dadaf8;
 `;
 
@@ -41,12 +41,43 @@ const CharacterHeaderName = styled.span`
 	margin-right: 50px;
 `;
 
+const BackupContainer = styled.div`
+	width: 80%;
+	padding: 12px;
+`;
+
+const CodeParagraph = styled.p`
+	word-wrap: break-word;
+`;
+
+const WarningText = styled.p`
+	color: red;
+	font-weight: bold;
+`;
+
 const storageKey = 'dt-bt';
 
 const Main = () => {
 	const [ selectedCharacter, setSelectedCharacter ] = useState('');
 	const [ characterStorageState, setCharacterStorageState ] = useState<CharactersStorage>({});
 	const [ statPool, setStatPool ] = useState<Record<string,number>>({});
+	const [ backupInput, setBackupInput ] = useState('');
+
+	const backupCode = useMemo(() => {
+		return Buffer.from(JSON.stringify(characterStorageState)).toString('base64');
+	}, [ characterStorageState ]);
+
+	const loadBackupCode = (code: string) => {
+		try {
+			const stringifiedData = Buffer.from(code, 'base64').toString('ascii');
+			const backupData = JSON.parse(stringifiedData);
+
+			updateCharactersStorage(backupData);
+		} catch {
+			alert('invalid code');
+			return;
+		}
+	};
 
 	const generateStatPool = () => {
 		if (!selectedCharacter || !Object.keys(characterStorageState).length) {
@@ -144,6 +175,20 @@ const Main = () => {
 	return (
 		<MainContainer>
 			{selectedCharacter ? renderCharacterBlocks() : renderCharacterSelection()}
+			<BackupContainer>
+				<p>To load backup, paste the backup code in the field below:</p>
+				<WarningText>WARNING: this will overwrite your current data</WarningText>
+				<form>
+					<input value={backupInput} onChange={(event) => {setBackupInput(event.target.value);}}/>
+					<button style={{ marginLeft: 10 }} onClick={(event) => {
+						event.preventDefault();
+						loadBackupCode(backupInput);
+						setBackupInput('');
+					}}>Load backup</button>
+				</form>
+				<p>To save backup, copy the code below and save it somewhere safe:</p>
+				<CodeParagraph>{backupCode}</CodeParagraph>
+			</BackupContainer>
 		</MainContainer>
 	);
 };
