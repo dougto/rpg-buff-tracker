@@ -29,35 +29,33 @@ const NewStatContainer = styled.form`
 
 const StatContainer = styled.div`
   display: flex;
-  width: 100%;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
+	margin: 0 24px 4px 24px;
 `;
 
 const StatName = styled.p`
-  min-width: 20%;
-  margin: 0 0 10px 0;
+	margin: 0;
 `;
 
 const NewStatInput = styled.input`
   width: 80px;
   text-align: center;
   height: 20px;
-  margin-right: 60px;
+  margin: 0 60px 0 20px;
 `;
 
 const StatValue = styled.input`
   width: 40px;
   text-align: center;
   height: 20px;
-  margin-right: 60px;
   background-color: #afe4ff;
 `;
 
 const RemoveButton = styled.button`
   color: red;
-  margin: 0;
+  margin: 0 0 0 8px;
 `;
 
 const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterData }) => {
@@ -81,6 +79,13 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 
 		if (name.length > 32) {
 			alert('name is too long');
+			return;
+		}
+
+		const formulaExists = characterData.formulas.find((formula) => formula.name === name);
+
+		if (formulaExists) {
+			alert('there is already a formula using this name');
 			return;
 		}
 
@@ -129,7 +134,7 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 		<StatBlockContainer>
 			<StatBlockTitle>Stats</StatBlockTitle>
 			<NewStatContainer>
-				<StatName>Add new stat: </StatName>
+				<p>Add new stat: </p>
 				<NewStatInput value={newStatName} onChange={(event) => { setNewStatName(event.target.value.trim()); }}/>
 				<button onClick={(event) => {
 					event.preventDefault();
@@ -141,8 +146,10 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 			{characterData.stats.map((stat) => (
 				<StatContainer key={stat.name}>
 					<StatName >{stat.name}:</StatName>
-					<StatValue onChange={(event) => { editStat(stat.name, event.target.value.trim()); }} defaultValue={stat.value}/>
-					<RemoveButton tabIndex={-1} onClick={() => {removeStat(stat.name);}}>X</RemoveButton>
+					<div>
+						<StatValue onChange={(event) => { editStat(stat.name, event.target.value.trim()); }} defaultValue={stat.value}/>
+						<RemoveButton tabIndex={-1} onClick={() => {removeStat(stat.name);}}>X</RemoveButton>
+					</div>
 				</StatContainer>
 			))}
 		</StatBlockContainer>

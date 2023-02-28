@@ -2,6 +2,11 @@ export interface CharactersStorage {
   [name: string]: CharacterData;
 }
 
+export interface FormulaInterface {
+  name: string;
+  formula: string;
+}
+
 export interface CharacterData {
   stats: Array<{
     name: string;
@@ -12,8 +17,5 @@ export interface CharacterData {
     enabled: boolean;
     stats: Record<string, number>;
   }>;
-  formulas: Array<{
-    name: string;
-    formula: string;
-  }>;
+  formulas: Array<FormulaInterface>;
 }

@@ -5,7 +5,7 @@ import { CharacterSelectionBlock } from '../components/CharacterSelectionBlock';
 import { StatBlock } from '../components/StatBlock';
 import { BuffBlock } from '../components/BuffBlock';
 import { FormulaBlock } from '../components/FormulaBlock';
-import { CharacterData, CharactersStorage } from '../shared/interfaces';
+import { CharacterData, CharactersStorage, FormulaInterface } from '../shared/interfaces';
 
 const MainContainer = styled.div`
   width: 100vw;
@@ -68,6 +68,41 @@ const Main = () => {
 		return Buffer.from(JSON.stringify(characterStorageState)).toString('base64');
 	}, [ characterStorageState ]);
 
+	const evalFormula = (formula: string, pool: Record<string, number>) => {
+		if (!formula) {
+			return '0';
+		}
+
+		const statNames = Object.keys(pool);
+
+		if (statNames.length === 0) {
+			return '0';
+		}
+
+		let expression = formula;
+
+		statNames.sort((prev, next) => {
+			if (prev.length > next.length) {
+				return -1;
+			}
+			return 1;
+		}).forEach((stat) => {
+			if (formula.includes(stat)) {
+				expression = expression.replaceAll(stat, String(pool[stat]));
+			}
+		});
+
+		expression = expression.replaceAll(' ', '');
+
+		try {
+			const result = Math.floor(eval(expression));
+
+			return String(result);
+		} catch (error) {
+			return '0';
+		}
+	};
+
 	const loadBackupCode = (code: string) => {
 		try {
 			const stringifiedData = Buffer.from(code, 'base64').toString('ascii');
@@ -78,6 +113,27 @@ const Main = () => {
 			alert('invalid code');
 			return;
 		}
+	};
+
+	const getFormulasWithDependencyOrder = (formulas: Array<FormulaInterface>) => {
+		let formulaPool: Array<FormulaInterface> = structuredClone(formulas);
+		let formulasWithDependencyOrder: Array<FormulaInterface> = [];
+
+		while (formulaPool.length > 0) {
+			const formula = formulaPool.pop();
+
+			if (!formula) break;
+
+			const isDependency = formulaPool.some((formulaFromPool) => formulaFromPool.formula.includes(formula.name));
+
+			if (isDependency) {
+				formulaPool = [ formula, ...formulaPool ];
+			} else {
+				formulasWithDependencyOrder = [ formula, ...formulasWithDependencyOrder ];
+			}
+		}
+
+		return formulasWithDependencyOrder;
 	};
 
 	const generateStatPool = () => {
@@ -103,6 +159,12 @@ const Main = () => {
 
 				newStatPool[buffStat] = previousValue;
 			});
+		});
+
+		getFormulasWithDependencyOrder(characterStorageState[selectedCharacter].formulas).forEach((formula) => {
+			const formulaResult = evalFormula(formula.formula, newStatPool);
+
+			newStatPool[formula.name] = Number.isNaN(formulaResult) ? 0 : parseInt(formulaResult);
 		});
 
 		setStatPool(newStatPool);

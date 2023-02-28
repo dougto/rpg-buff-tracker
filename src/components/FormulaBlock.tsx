@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { CharacterData } from '../shared/interfaces';
+import { CharacterData, FormulaInterface } from '../shared/interfaces';
 import { HorizontalLine } from '../components/HorizontalLine';
 import { CollapseBox } from '../components/CollapseBox';
 
@@ -80,43 +80,8 @@ const CollapseBoxContainer = styled.div`
 	margin: 8px 8px 12px 8px;
 `;
 
-const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, updateCharacterData }) => {
+const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool, characterData, updateCharacterData }) => {
 	const [ newFormulaName, setNewFormulaName ] = useState('');
-
-	const evalFormula = (formula: string) => {
-		if (!formula) {
-			return 0;
-		}
-
-		const statNames = Object.keys(statPool);
-
-		if (statNames.length === 0) {
-			return 0;
-		}
-
-		let expression = formula;
-
-		statNames.sort((prev, next) => {
-			if (prev.length > next.length) {
-				return -1;
-			}
-			return 1;
-		}).forEach((stat) => {
-			if (formula.includes(stat)) {
-				expression = expression.replaceAll(stat, String(statPool[stat]));
-			}
-		});
-
-		expression = expression.replaceAll(' ', '');
-
-		try {
-			const result = Math.floor(eval(expression));
-
-			return result;
-		} catch (error) {
-			return 'invalid formula';
-		}
-	};
 
 	const addNewFormula = (name: string) => {
 		const newFormulas = [ ...characterData.formulas, { name, formula: '' } ];
@@ -128,7 +93,19 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 	};
 
 	const editFormula = (formulaName: string, value: string) => {
-		const formulasCopy = [ ...characterData.formulas ];
+		const isCyclicDependency = characterData.formulas.some((formula) => {
+			if (formula.formula.includes(formulaName) && value.includes(formula.name)) {
+				return true;
+			}
+			return false;
+		});
+
+		if (isCyclicDependency) {
+			alert('cyclic dependencies are not allowed');
+			return;
+		}
+
+		const formulasCopy: Array<FormulaInterface> = structuredClone(characterData.formulas);
 
 		formulasCopy.forEach((formula) => {
 			if (formula.name === formulaName) {
@@ -171,7 +148,7 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 							<FormulaContainer>
 								<FormulaRow>
 									<FormulaName>{formula.name}</FormulaName>
-									<FormulaName>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></FormulaName>
+									<FormulaName>result: <ResultNumber>{String(statPool[formula.name])}</ResultNumber></FormulaName>
 								</FormulaRow>
 							</FormulaContainer>
 						)}
@@ -179,7 +156,7 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 							<FormulaContainer>
 								<FormulaRow>
 									<FormulaName>{formula.name}</FormulaName>
-									<FormulaName>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></FormulaName>
+									<FormulaName>result: <ResultNumber>{String(statPool[formula.name])}</ResultNumber></FormulaName>
 								</FormulaRow>
 								<FormulaRow>
 									<FormulaExpression

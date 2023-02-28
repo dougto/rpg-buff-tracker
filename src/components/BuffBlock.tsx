@@ -201,6 +201,13 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 			return;
 		}
 
+		const formulaExists = characterData.formulas.find((formula) => formula.name === newBuffStat[buffName]);
+
+		if (formulaExists) {
+			alert('there is already a formula using this name');
+			return;
+		}
+
 		const buffsCopy = [ ...characterData.buffs ];
 
 		buffsCopy.forEach((buff) => {
