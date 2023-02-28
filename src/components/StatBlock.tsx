@@ -91,7 +91,7 @@ const StatBlock: React.FC<StatBlockProps> = ({ characterData, updateCharacterDat
 			return;
 		}
 
-		const newStats = [ { name, value: 0 }, ...characterData.stats ];
+		const newStats = [ ...characterData.stats, { name, value: 0 } ];
 
 		const newCharacterData: CharacterData = {
 			...characterData,
