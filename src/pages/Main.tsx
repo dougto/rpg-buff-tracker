@@ -94,9 +94,10 @@ const Main = () => {
 		characterStorageState[selectedCharacter].buffs.forEach((buff) => {
 			Object.keys(buff.stats).forEach((buffStat) => {
 				const previousValue = newStatPool[buffStat] || 0;
+				const newValue = previousValue > buff.stats[buffStat] ? previousValue : buff.stats[buffStat];
 
 				if (buff.enabled){
-					newStatPool[buffStat] = previousValue + buff.stats[buffStat];
+					newStatPool[buffStat] = newValue;
 					return;
 				}
 
@@ -187,7 +188,7 @@ const Main = () => {
 
 	useEffect(() => {
 		generateStatPool();
-	}, [ characterStorageState ]);
+	}, [ characterStorageState, selectedCharacter ]);
 
 	return (
 		<MainContainer>

@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { CharacterData } from '../shared/interfaces';
 import { HorizontalLine } from '../components/HorizontalLine';
-import { useState } from 'react';
+import { CollapseBox } from '../components/CollapseBox';
 
 interface BuffBlockProps {
   characterData: CharacterData;
@@ -21,13 +22,24 @@ const BuffBlockTitle = styled.h1`
 
 const BuffContainer = styled.div`
   display: flex;
-  width: 95%;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-bottom: 8px;
-  background-color: #b2b2f7;
+  flex-direction: column;
   padding: 8px;
+	width: 100%;
+`;
+
+const BuffContainerHeader = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: flex-start;
+`;
+
+const BuffContainerRow = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-start;
+	width: 100%;
 `;
 
 const NewBuffContainer = styled.form`
@@ -59,8 +71,7 @@ const BuffName = styled.p`
 `;
 
 const BuffStat = styled.p`
-  width: 40%;
-  margin: 0 20px 0 0;
+	margin: 0;
 `;
 
 const BuffCheckbox = styled.input`
@@ -69,11 +80,12 @@ const BuffCheckbox = styled.input`
 `;
 
 const BuffStatsContainer = styled.div`
-  width: 40%;
+  width: 100%;
+	margin-top: 12px;
 `;
 
 const BuffStatsInput = styled.input`
-  width: 20px;
+  width: 30px;
   text-align: center;
   height: 16px;
   margin-right: 10px;
@@ -82,15 +94,19 @@ const BuffStatsInput = styled.input`
 
 const BuffRow = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   flex-direction: row;
-  width: 65%;
+  width: 100%;
   margin-bottom: 4px;
 `;
 
 const RemoveStatButton = styled.button`
   color: red;
   margin: 0;
+`;
+
+const CollapseBoxContainer = styled.div`
+	margin: 8px 8px 12px 8px;
 `;
 
 const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterData }) => {
@@ -229,33 +245,55 @@ const BuffBlock: React.FC<BuffBlockProps> = ({ characterData, updateCharacterDat
 			</NewBuffContainer>
 			<HorizontalLine />
 			{characterData.buffs.map((buff) => (
-				<BuffContainer key={buff.name}>
-					<BuffCheckbox type="checkbox" checked={buff.enabled} onChange={(event) => {onCheckboxChange(buff.name, event.target.checked);}}/>
-					<BuffName>{buff.name}</BuffName>
-					<BuffStatsContainer>
-						{Object.keys(buff.stats).map((stat) => (
-							<BuffRow key={stat}>
-								<BuffStat >{stat}: </BuffStat>
-								<BuffStatsInput
-									onChange={(event) => {onBuffStatChange(buff.name, stat, event.target.value.trim());}}
-									defaultValue={buff.stats[stat]}
-								/>
-								<RemoveStatButton tabIndex={-1} onClick={() => {removeBuffStat(buff.name, stat);}}>X</RemoveStatButton>
-							</BuffRow>
-						))}
-						<BuffRow>
-							<form>
-								<NewStatInput value={newBuffStat[buff.name]} onChange={(event) => {onNewStatChange(buff.name, event.target.value.trim());}}/>
-								<button onClick={(event) => {
-									event.preventDefault();
-									addNewBuffStat(buff.name);
-									onNewStatChange(buff.name, ' ');
-								}}>add stat</button>
-							</form>
-						</BuffRow>
-					</BuffStatsContainer>
-					<button onClick={() => {removeBuff(buff.name);}}>Remove buff</button>
-				</BuffContainer>
+				<CollapseBoxContainer key={buff.name}>
+					<CollapseBox
+						CollapsedComponent={(
+							<BuffContainer>
+								<BuffContainerHeader>
+									<BuffCheckbox type="checkbox" checked={buff.enabled} onChange={(event) => {onCheckboxChange(buff.name, event.target.checked);}}/>
+									<BuffName>{buff.name}</BuffName>
+								</BuffContainerHeader>
+							</BuffContainer>
+						)}
+						NotCollapsedComponent={(
+							<BuffContainer >
+								<BuffContainerRow>
+									<BuffContainerHeader>
+										<BuffCheckbox type="checkbox" checked={buff.enabled} onChange={(event) => {onCheckboxChange(buff.name, event.target.checked);}}/>
+										<BuffName>{buff.name}</BuffName>
+									</BuffContainerHeader>
+									<button onClick={() => {removeBuff(buff.name);}}>Remove buff</button>
+								</BuffContainerRow>
+								<BuffContainerRow>
+									<BuffStatsContainer>
+										{Object.keys(buff.stats).map((stat) => (
+											<BuffRow key={stat}>
+												<BuffStat >{stat}: </BuffStat>
+												<div>
+													<BuffStatsInput
+														onChange={(event) => {onBuffStatChange(buff.name, stat, event.target.value.trim());}}
+														defaultValue={buff.stats[stat]}
+													/>
+													<RemoveStatButton tabIndex={-1} onClick={() => {removeBuffStat(buff.name, stat);}}>X</RemoveStatButton>
+												</div>
+											</BuffRow>
+										))}
+										<BuffRow>
+											<form>
+												<NewStatInput value={newBuffStat[buff.name]} onChange={(event) => {onNewStatChange(buff.name, event.target.value.trim());}}/>
+												<button onClick={(event) => {
+													event.preventDefault();
+													addNewBuffStat(buff.name);
+													onNewStatChange(buff.name, ' ');
+												}}>add stat</button>
+											</form>
+										</BuffRow>
+									</BuffStatsContainer>
+								</BuffContainerRow>
+							</BuffContainer>
+						)}
+					/>
+				</CollapseBoxContainer>
 			))}
 		</BuffBlockContainer>
 	);

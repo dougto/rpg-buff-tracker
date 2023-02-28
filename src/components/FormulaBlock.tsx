@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { CharacterData } from '../shared/interfaces';
 import { HorizontalLine } from '../components/HorizontalLine';
+import { CollapseBox } from '../components/CollapseBox';
 
 interface FormulaBlockProps {
   characterData: CharacterData;
@@ -39,10 +40,10 @@ const NewFormulaInput = styled.input`
 const FormulaContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 95%;
+  width: 92%;
   margin-bottom: 8px;
   background-color: #b2b2f7;
-  padding: 8px 8px 8px 20px;
+  padding: 0 8px 0 20px;
 `;
 
 const FormulaRow = styled.div`
@@ -50,6 +51,7 @@ const FormulaRow = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+	width: 100%;
 `;
 
 const FormulaName = styled.p`
@@ -59,14 +61,23 @@ const FormulaName = styled.p`
 const FormulaExpression = styled.input`
   text-align: center;
   height: 16px;
-  margin-right: 10px;
+  margin-top: 12px;
+	width: 65%;
   background-color: #afe4ff;
+`;
+
+const RemoveButton = styled.button`
+	margin-top: 12px;
 `;
 
 const ResultNumber = styled.span`
   color: #019401;
   font-weight: bold;
   font-size: 18px;
+`;
+
+const CollapseBoxContainer = styled.div`
+	margin: 8px 8px 12px 8px;
 `;
 
 const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, updateCharacterData }) => {
@@ -103,7 +114,7 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 
 			return result;
 		} catch (error) {
-			return 0;
+			return 'invalid formula';
 		}
 	};
 
@@ -154,17 +165,33 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool ,characterData, up
 			</NewFormulaContainer>
 			<HorizontalLine/>
 			{characterData.formulas.map((formula) => (
-				<FormulaContainer key={formula.name}>
-					<FormulaRow>
-						<FormulaName>{formula.name}</FormulaName>
-						<FormulaExpression
-							onChange={(event) => {editFormula(formula.name, event.target.value.trim());}}
-							defaultValue={formula.formula}
-						/>
-						<button tabIndex={-1} onClick={() => {removeFormula(formula.name);}}>Remove</button>
-					</FormulaRow>
-					<p>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></p>
-				</FormulaContainer>
+				<CollapseBoxContainer key={formula.name}>
+					<CollapseBox
+						CollapsedComponent={(
+							<FormulaContainer>
+								<FormulaRow>
+									<FormulaName>{formula.name}</FormulaName>
+									<FormulaName>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></FormulaName>
+								</FormulaRow>
+							</FormulaContainer>
+						)}
+						NotCollapsedComponent={(
+							<FormulaContainer>
+								<FormulaRow>
+									<FormulaName>{formula.name}</FormulaName>
+									<FormulaName>result: <ResultNumber>{evalFormula(formula.formula)}</ResultNumber></FormulaName>
+								</FormulaRow>
+								<FormulaRow>
+									<FormulaExpression
+										onChange={(event) => {editFormula(formula.name, event.target.value.trim());}}
+										defaultValue={formula.formula}
+									/>
+									<RemoveButton tabIndex={-1} onClick={() => {removeFormula(formula.name);}}>Remove</RemoveButton>
+								</FormulaRow>
+							</FormulaContainer>
+						)}
+					/>
+				</CollapseBoxContainer>
 			))}
 		</FormulaBlockContainer>
 	);

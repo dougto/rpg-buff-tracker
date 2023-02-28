@@ -100,7 +100,7 @@ const CharacterSelectionBlock: React.FC<CharacterSelectionBlockProps> = ({
 				<CharacterName>{name}</CharacterName>
 				<div>
 					<button onClick={() => {setSelectedCharacter(name);}}>Select</button>
-					<RemoveCharacterButton onDoubleClick={() => {removeCharacter(name);}}>Double click to remove</RemoveCharacterButton>
+					<RemoveCharacterButton onDoubleClick={() => {removeCharacter(name);}}>Remove</RemoveCharacterButton>
 				</div>
 			</CharacterBlock>
 		));
