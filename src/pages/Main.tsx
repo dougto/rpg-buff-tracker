@@ -150,7 +150,7 @@ const Main = () => {
 		characterStorageState[selectedCharacter].buffs.forEach((buff) => {
 			Object.keys(buff.stats).forEach((buffStat) => {
 				const previousValue = newStatPool[buffStat] || 0;
-				const newValue = previousValue > buff.stats[buffStat] ? previousValue : buff.stats[buffStat];
+				const newValue = previousValue > buff.stats[buffStat] && previousValue !== 0 ? previousValue : buff.stats[buffStat];
 
 				if (buff.enabled){
 					newStatPool[buffStat] = newValue;
@@ -171,7 +171,7 @@ const Main = () => {
 	};
 
 	const updateCharacterData = (newValue: CharacterData) => {
-		const newCharacterStorageState = structuredClone(characterStorageState);
+		const newCharacterStorageState = JSON.parse(localStorage.getItem(storageKey) || '{}');
 		newCharacterStorageState[selectedCharacter] = newValue;
 
 		updateCharactersStorage(newCharacterStorageState);
