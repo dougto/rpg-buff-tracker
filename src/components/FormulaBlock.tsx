@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { CharacterData, FormulaInterface } from '../shared/interfaces';
 import { HorizontalLine } from '../components/HorizontalLine';
 import { CollapseBox } from '../components/CollapseBox';
+import { SearchField } from '../components/SearchField';
 
 interface FormulaBlockProps {
   characterData: CharacterData;
@@ -58,16 +59,13 @@ const FormulaName = styled.p`
   margin: 0;
 `;
 
-const FormulaExpression = styled.input`
-  text-align: center;
-  height: 16px;
-  margin-top: 12px;
-	width: 65%;
-  background-color: #afe4ff;
-`;
-
-const RemoveButton = styled.button`
+const InputAndButtonContainer = styled.div`
 	margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+	width: 100%;
 `;
 
 const ResultNumber = styled.span`
@@ -159,11 +157,14 @@ const FormulaBlock: React.FC<FormulaBlockProps> = ({ statPool, characterData, up
 									<FormulaName>result: <ResultNumber>{String(statPool[formula.name])}</ResultNumber></FormulaName>
 								</FormulaRow>
 								<FormulaRow>
-									<FormulaExpression
-										onChange={(event) => {editFormula(formula.name, event.target.value.trim());}}
-										defaultValue={formula.formula}
-									/>
-									<RemoveButton tabIndex={-1} onClick={() => {removeFormula(formula.name);}}>Remove</RemoveButton>
+									<InputAndButtonContainer>
+										<SearchField
+											updateFormula={(formulaFromField: string) => {editFormula(formula.name, formulaFromField.trim());}}
+											suggestionPool={Object.keys(statPool)}
+											defaultValue={formula.formula}
+										/>
+										<button tabIndex={-1} onClick={() => {removeFormula(formula.name);}}>Remove</button>
+									</InputAndButtonContainer>
 								</FormulaRow>
 							</FormulaContainer>
 						)}
